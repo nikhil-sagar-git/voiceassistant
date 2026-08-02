@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Voice Assistant</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+
+height:100vh;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
+
+overflow:hidden;
+
+}
+
+.container{
+
+text-align:center;
+
+background:rgba(255,255,255,.06);
+
+padding:50px;
+
+border-radius:25px;
+
+backdrop-filter:blur(15px);
+
+box-shadow:0 20px 50px rgba(0,0,0,.5);
+
+width:400px;
+
+}
+
+.title{
+
+font-size:34px;
+
+color:white;
+
+font-weight:bold;
+
+margin-bottom:10px;
+
+}
+
+.subtitle{
+
+color:#cbd5e1;
+
+margin-bottom:40px;
+
+}
+
+.mic{
+
+width:140px;
+
+height:140px;
+
+border-radius:50%;
+
+border:none;
+
+background:#2563eb;
+
+color:white;
+
+font-size:60px;
+
+cursor:pointer;
+
+transition:.4s;
+
+position:relative;
+
+overflow:hidden;
+
+box-shadow:0 0 25px #2563eb;
+
+}
+
+.mic:hover{
+
+transform:scale(1.08);
+
+box-shadow:0 0 45px #3b82f6;
+
+}
+
+.mic.active{
+
+animation:pulse 1s infinite;
+
+background:#10b981;
+
+box-shadow:0 0 50px #10b981;
+
+}
+
+@keyframes pulse{
+
+0%{
+
+transform:scale(1);
+
+box-shadow:0 0 20px #10b981;
+
+}
+
+50%{
+
+transform:scale(1.15);
+
+box-shadow:0 0 60px #10b981;
+
+}
+
+100%{
+
+transform:scale(1);
+
+box-shadow:0 0 20px #10b981;
+
+}
+
+}
+
+.ripple{
+
+position:absolute;
+
+border-radius:50%;
+
+background:rgba(255,255,255,.5);
+
+transform:scale(0);
+
+animation:ripple .7s linear;
+
+}
+
+@keyframes ripple{
+
+to{
+
+transform:scale(6);
+
+opacity:0;
+
+}
+
+}
+
+.status{
+
+margin-top:30px;
+
+font-size:20px;
+
+color:white;
+
+font-weight:bold;
+
+}
+
+.footer{
+
+margin-top:30px;
+
+color:#94a3b8;
+
+font-size:14px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="title">
+AI Voice Assistant
+</div>
+
+<div class="subtitle">
+Click the microphone and start speaking
+</div>
+
+<form method="POST">
+
+<button id="micBtn" class="mic">
+
+<i class="fa-solid fa-microphone"></i>
+
+</button>
+
+</form>
+
+<div id="status" class="status">
+
+Idle
+
+</div>
+
+<div class="footer">
+
+Powered by Python • Flask • Speech Recognition
+
+</div>
+
+</div>
+
+<script>
+
+const btn=document.getElementById("micBtn");
+
+const status=document.getElementById("status");
+
+btn.addEventListener("click",function(e){
+
+btn.classList.add("active");
+
+status.innerHTML="Listening...";
+
+let ripple=document.createElement("span");
+
+ripple.classList.add("ripple");
+
+let rect=btn.getBoundingClientRect();
+
+ripple.style.left=(e.clientX-rect.left)+"px";
+
+ripple.style.top=(e.clientY-rect.top)+"px";
+
+btn.appendChild(ripple);
+
+setTimeout(()=>{
+
+ripple.remove();
+
+},700);
+
+});
+
+</script>
+
+</body>
+</html>
