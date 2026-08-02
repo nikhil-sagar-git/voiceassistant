@@ -278,7 +278,7 @@ import pyjokes
 
 app = Flask(__name__)
 
-API_KEY = "YOUR_OPENWEATHER_API_KEY"
+API_KEY = "5c2daec77599d6992d18d8d10c9bfc85"
 
 
 def get_weather(city):
