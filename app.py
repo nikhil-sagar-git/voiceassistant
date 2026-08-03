@@ -337,10 +337,15 @@ def assistant():
 
         song = text.replace("play", "").strip()
 
+        youtube_url = (
+        f"https://www.google.com/search?q={song.replace(' ', '+')}+site:youtube.com&btnI=1"
+        )
+
         return jsonify({
-            "reply":"Opening YouTube",
-            "youtube":f"https://www.youtube.com/results?search_query={song}"
+        "reply": f"Playing {song}",
+        "youtube": youtube_url
         })
+
 
     else:
 
