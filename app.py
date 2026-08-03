@@ -333,20 +333,19 @@ def assistant():
 
     elif "send email" in text:
 
-        email = ""
-
-        subject = "Hello"
-
-        body = "This email is sent from my AI Voice Assistant."
-
         words = text.split()
 
+        email = ""
+
         if "to" in words:
-            email = words[words.index("to")+1]
+            email = words[words.index("to") + 1]
+
+        subject = "Hello"
+        body = "Sent from AI Voice Assistant"
 
         return jsonify({
-            "reply": "Opening Gmail",
-            "email": f"mailto:{email}?subject={subject}&body={body}"
+            "reply": f"Opening email for {email}",
+            "mail": f"mailto:{email}?subject={subject}&body={body}"
         })
 
 
