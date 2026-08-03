@@ -43,21 +43,53 @@ recognition.onresult = (event) => {
 
     .then(data => {
 
-        response.innerHTML = data.reply;
+    response.innerHTML = data.reply;
 
-        const speech = new SpeechSynthesisUtterance(data.reply);
+    const speech = new SpeechSynthesisUtterance(data.reply);
 
-        speech.lang = "en-US";
-        speech.rate = 1;
-        speech.pitch = 1;
+    speech.lang = "en-US";
+    speech.rate = 1;
+    speech.pitch = 1;
 
-        window.speechSynthesis.speak(speech);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(speech);
 
-        if (data.youtube) {
-            window.open(data.youtube, "_blank");
-        }
+    // Open YouTube
+    if (data.youtube) {
+        window.open(data.youtube, "_blank");
+    }
 
-    });
+    // Open Google Search
+    if (data.google) {
+        window.open(data.google, "_blank");
+    }
+
+    // Open Google Maps
+    if (data.maps) {
+        window.open(data.maps, "_blank");
+    }
+
+    // Open Any Website
+    if (data.website) {
+        window.open(data.website, "_blank");
+    }
+
+    // Gmail Compose
+    if (data.mail) {
+        window.open(data.mail, "_blank");
+    }
+
+    // Telephone
+    if (data.phone) {
+        window.location.href = data.phone;
+    }
+
+    // SMS
+    if (data.sms) {
+        window.location.href = data.sms;
+    }
+
+});
 
 };
 

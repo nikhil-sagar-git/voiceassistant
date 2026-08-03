@@ -357,6 +357,65 @@ def assistant():
             f"https://www.youtube.com/results?search_query={song.replace(' ','+')}"
 
         })
+    
+
+        # ----------------------------
+    # Maps & Directions
+    # ----------------------------
+    elif "directions from" in text and "to" in text:
+
+        # Example: directions from Hyderabad to Warangal
+        try:
+            route = text.split("directions from", 1)[1].strip()
+            origin, destination = route.split(" to ", 1)
+
+            maps_url = (
+                "https://www.google.com/maps/dir/"
+                f"{origin.strip().replace(' ', '+')}/"
+                f"{destination.strip().replace(' ', '+')}"
+            )
+
+            return jsonify({
+                "reply": f"Showing directions from {origin} to {destination}",
+                "maps": maps_url
+            })
+
+        except:
+            return jsonify({
+                "reply": "Please say directions from place A to place B."
+            })
+
+    elif "directions to" in text or "navigate to" in text:
+
+        # Example: navigate to Charminar
+        destination = (
+            text.replace("directions to", "")
+            .replace("navigate to", "")
+            .strip()
+        )
+
+        maps_url = (
+            "https://www.google.com/maps/dir/?api=1"
+            f"&destination={destination.replace(' ', '+')}"
+        )
+
+        return jsonify({
+            "reply": f"Navigating to {destination}",
+            "maps": maps_url
+        })
+
+    elif "map" in text or "location" in text:
+
+        place = (
+            text.replace("map", "")
+            .replace("location", "")
+            .strip()
+        )
+
+        return jsonify({
+            "reply": f"Opening Google Maps for {place}",
+            "maps": f"https://www.google.com/maps/search/{place.replace(' ', '+')}"
+        })
 
     # ----------------------------
     # Google Search
