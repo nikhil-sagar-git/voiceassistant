@@ -311,23 +311,49 @@ def assistant():
 
         reply = pyjokes.get_joke()
 
-    # ----------------------------
-    # Wikipedia
-    # ----------------------------
-    elif "who is" in text or "what is" in text:
+    # # ----------------------------
+    # # Wikipedia
+    # # ----------------------------
+    # elif "who is" in text or "what is" in text:
 
-        person = (
-            text.replace("who is", "")
-            .replace("what is", "")
-            .strip()
-        )
+    #     person = (
+    #         text.replace("who is", "")
+    #         .replace("what is", "")
+    #         .strip()
+    #     )
 
-        try:
-            reply = wikipedia.summary(person, sentences=2)
+    #     try:
+    #         reply = wikipedia.summary(person, sentences=2)
 
-        except:
+    #     except:
 
-            reply = "Sorry, I couldn't find information."
+    #         reply = "Sorry, I couldn't find information."
+
+
+    elif (
+    "who is" in text or
+    "what is" in text or
+    "tell me about" in text or
+    "search" in text or
+    "explain" in text):
+
+        query = text
+
+        for word in [
+            "who is",
+            "what is",
+            "tell me about",
+            "search",
+            "explain"
+        ]:
+            query = query.replace(word, "")
+
+        query = query.strip()
+
+        return jsonify({
+            "reply": f"Searching Google for {query}",
+            "google": f"https://www.google.com/search?q={query.replace(' ','+')}"
+        })
 
     # ----------------------------
     # Weather
@@ -404,7 +430,7 @@ def assistant():
             "maps": maps_url
         })
 
-    elif "map" in text or "location" in text:
+    elif "maps" in text or "location" in text:
 
         place = (
             text.replace("map", "")
