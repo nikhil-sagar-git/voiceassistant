@@ -133,141 +133,97 @@
 # #         engine_talk("I could not hear you properly")
 
 
-# # while True:
-# #     run_alexa()
 
 
-# from flask import Flask, render_template, request
-# import warnings
-# warnings.filterwarnings("ignore")
-
-# import speech_recognition as sr
-# import pyttsx3
-# import pywhatkit
+# from flask import Flask, render_template, request, jsonify
 # import datetime
-# import pyjokes
-# import wikipedia
 # import requests
-# import sys
+# import wikipedia
+# import pyjokes
 
 # app = Flask(__name__)
 
-# listener = sr.Recognizer()
+# API_KEY = "5c2daec77599d6992d18d8d10c9bfc85"
 
 
-
-# def engine_talk(text):
-#     engine = pyttsx3.init()
-
-#     voices = engine.getProperty("voices")
-#     engine.setProperty("voice", voices[1].id)
-
-#     engine.say(text)
-#     engine.runAndWait()
-#     engine.stop()
-
-
-# def user_commands():
-#     command = ""
-
+# def get_weather(city):
 #     try:
-#         with sr.Microphone() as source:
-#             print("Listening...")
-#             listener.adjust_for_ambient_noise(source)
-#             voice = listener.listen(source)
+#         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+#         data = requests.get(url).json()
 
-#             command = listener.recognize_google(voice)
-#             command = command.lower()
+#         if data.get("cod") != 200:
+#             return "Sorry, I couldn't find that city."
 
-#             if "alexa" in command:
-#                 command = command.replace("alexa", "").strip()
+#         temp = data["main"]["temp"]
+#         desc = data["weather"][0]["description"]
 
-#             print(command)
+#         return f"The temperature in {city} is {temp} degree Celsius with {desc}."
 
-#     except Exception as e:
-#         print(e)
-
-#     return command
+#     except:
+#         return "Unable to get weather information."
 
 
-# def weather(city):
-#     api_key = "5c2daec77599d6992d18d8d10c9bfc85"
-
-#     url = f"http://api.openweathermap.org/data/2.5/weather?appid={api_key}&q={city}"
-
-#     response = requests.get(url)
-
-#     data = response.json()
-
-#     if data.get("cod") != "404":
-#         temp = data["main"]["temp"] - 273.15
-#         return round(temp, 1)
-
-#     return None
-
-
-# def run_alexa():
-
-#     command = user_commands()
-
-#     if command == "":
-#         engine_talk("I didn't hear anything.")
-#         return
-
-#     if "play a song" in command:
-#         engine_talk("Playing music")
-#         pywhatkit.playonyt("Arijit Singh")
-
-#     elif "play" in command:
-#         song = command.replace("play", "")
-#         engine_talk("Playing " + song)
-#         pywhatkit.playonyt(song)
-
-#     elif "time" in command:
-#         time = datetime.datetime.now().strftime("%I:%M %p")
-#         engine_talk("Current time is " + time)
-
-#     elif "joke" in command:
-#         joke = pyjokes.get_joke()
-#         engine_talk(joke)
-
-#     elif "who is" in command:
-#         person = command.replace("who is", "")
-
-#         try:
-#             info = wikipedia.summary(person, 1)
-#             engine_talk(info)
-
-#         except:
-#             engine_talk("Sorry, I could not find that person.")
-
-#     elif "weather" in command:
-#         city = "Hong Kong"
-
-#         temp = weather(city)
-
-#         if temp:
-#             engine_talk(f"The temperature in {city} is {temp} degree Celsius")
-
-#     elif "stop" in command:
-#         engine_talk("Good Bye")
-#         sys.exit()
-
-#     else:
-#         engine_talk("Please say it again.")
-
-
-# @app.route("/", methods=["GET", "POST"])
+# @app.route("/")
 # def home():
-
-#     if request.method == "POST":
-#         run_alexa()
-
 #     return render_template("index.html")
 
 
+# @app.route("/assistant", methods=["POST"])
+# def assistant():
+
+#     text = request.json["text"].lower()
+
+#     if "time" in text:
+#         reply = "Current time is " + datetime.datetime.now().strftime("%I:%M %p")
+
+#     elif "joke" in text:
+#         reply = pyjokes.get_joke()
+
+#     elif "who is" in text:
+#         person = text.replace("who is", "").strip()
+
+#         try:
+#             reply = wikipedia.summary(person, 2)
+#         except:
+#             reply = "Sorry, I couldn't find information."
+
+#     elif "weather" in text:
+
+#         city = "Hyderabad"
+
+#         words = text.split()
+
+#         if "in" in words:
+#             city = " ".join(words[words.index("in")+1:])
+
+#         reply = get_weather(city)
+
+#     elif "play" in text:
+
+#         song = text.replace("play", "").strip()
+
+#         youtube_url = (
+#         f"https://www.google.com/search?q={song.replace(' ', '+')}+site:youtube.com&btnI=1"
+#         )
+
+#         return jsonify({
+#         "reply": f"Playing {song}",
+#         "youtube": youtube_url
+#         })
+
+
+#     else:
+
+#         reply = "Sorry, I didn't understand."
+
+#     return jsonify({"reply":reply})
+
+
 # if __name__ == "__main__":
-#     app.run(debug=False)
+#     app.run(debug=True)
+
+
+
 
 
 from flask import Flask, render_template, request, jsonify
@@ -278,81 +234,237 @@ import pyjokes
 
 app = Flask(__name__)
 
+# ==============================
+# OpenWeather API Key
+# ==============================
 API_KEY = "5c2daec77599d6992d18d8d10c9bfc85"
 
-
+# ==============================
+# Weather Function
+# ==============================
 def get_weather(city):
     try:
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-        data = requests.get(url).json()
 
-        if data.get("cod") != 200:
+        response = requests.get(url, timeout=5)
+
+        data = response.json()
+
+        if response.status_code != 200:
             return "Sorry, I couldn't find that city."
 
         temp = data["main"]["temp"]
         desc = data["weather"][0]["description"]
 
-        return f"The temperature in {city} is {temp} degree Celsius with {desc}."
+        return f"The temperature in {city.title()} is {temp}°C with {desc}."
 
     except:
-        return "Unable to get weather information."
+        return "Unable to fetch weather information."
 
 
+# ==============================
+# Home Page
+# ==============================
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+# ==============================
+# Voice Assistant
+# ==============================
 @app.route("/assistant", methods=["POST"])
 def assistant():
 
-    text = request.json["text"].lower()
+    data = request.get_json()
 
-    if "time" in text:
+    text = data.get("text", "").lower().strip()
+
+    if text == "":
+        return jsonify({"reply": "Please say something."})
+
+    # ----------------------------
+    # Greetings
+    # ----------------------------
+    if any(word in text for word in ["hello", "hi", "hey"]):
+
+        reply = "Hello! How can I help you today?"
+
+    # ----------------------------
+    # Time
+    # ----------------------------
+    elif "time" in text:
+
         reply = "Current time is " + datetime.datetime.now().strftime("%I:%M %p")
 
+    # ----------------------------
+    # Date
+    # ----------------------------
+    elif "date" in text:
+
+        reply = "Today is " + datetime.datetime.now().strftime("%A, %d %B %Y")
+
+    # ----------------------------
+    # Joke
+    # ----------------------------
     elif "joke" in text:
+
         reply = pyjokes.get_joke()
 
-    elif "who is" in text:
-        person = text.replace("who is", "").strip()
+    # ----------------------------
+    # Wikipedia
+    # ----------------------------
+    elif "who is" in text or "what is" in text:
+
+        person = (
+            text.replace("who is", "")
+            .replace("what is", "")
+            .strip()
+        )
 
         try:
-            reply = wikipedia.summary(person, 2)
+            reply = wikipedia.summary(person, sentences=2)
+
         except:
+
             reply = "Sorry, I couldn't find information."
 
+    # ----------------------------
+    # Weather
+    # ----------------------------
     elif "weather" in text:
 
         city = "Hyderabad"
 
-        words = text.split()
+        if " in " in text:
 
-        if "in" in words:
-            city = " ".join(words[words.index("in")+1:])
+            city = text.split(" in ", 1)[1].strip()
 
         reply = get_weather(city)
 
-    elif "play" in text:
+    # ----------------------------
+    # Play Song
+    # ----------------------------
+    elif text.startswith("play"):
 
         song = text.replace("play", "").strip()
 
-        youtube_url = (
-        f"https://www.google.com/search?q={song.replace(' ', '+')}+site:youtube.com&btnI=1"
+        return jsonify({
+
+            "reply": f"Opening YouTube for {song}",
+
+            "youtube":
+            f"https://www.youtube.com/results?search_query={song.replace(' ','+')}"
+
+        })
+
+    # ----------------------------
+    # Google Search
+    # ----------------------------
+    elif "search" in text:
+
+        query = text.replace("search", "").strip()
+
+        return jsonify({
+
+            "reply": f"Searching Google for {query}",
+
+            "google":
+            f"https://www.google.com/search?q={query.replace(' ','+')}"
+
+        })
+
+    # ----------------------------
+    # Maps
+    # ----------------------------
+    elif "map" in text or "location" in text:
+
+        place = (
+            text.replace("map", "")
+            .replace("location", "")
+            .strip()
         )
 
         return jsonify({
-        "reply": f"Playing {song}",
-        "youtube": youtube_url
+
+            "reply": f"Opening Google Maps for {place}",
+
+            "maps":
+            f"https://www.google.com/maps/search/{place.replace(' ','+')}"
+
         })
 
+    # ----------------------------
+    # Open Websites
+    # ----------------------------
+    elif "open youtube" in text:
 
+        return jsonify({
+
+            "reply":"Opening YouTube",
+
+            "website":"https://youtube.com"
+
+        })
+
+    elif "open google" in text:
+
+        return jsonify({
+
+            "reply":"Opening Google",
+
+            "website":"https://google.com"
+
+        })
+
+    elif "open github" in text:
+
+        return jsonify({
+
+            "reply":"Opening GitHub",
+
+            "website":"https://github.com"
+
+        })
+
+    elif "open chatgpt" in text:
+
+        return jsonify({
+
+            "reply":"Opening ChatGPT",
+
+            "website":"https://chatgpt.com"
+
+        })
+
+    # ----------------------------
+    # Thank You
+    # ----------------------------
+    elif "thank" in text:
+
+        reply = "You're welcome."
+
+    # ----------------------------
+    # Bye
+    # ----------------------------
+    elif "bye" in text or "goodbye" in text:
+
+        reply = "Goodbye. Have a great day."
+
+    # ----------------------------
+    # Unknown
+    # ----------------------------
     else:
 
-        reply = "Sorry, I didn't understand."
+        reply = (
+            "Sorry, I don't understand that command yet."
+        )
 
-    return jsonify({"reply":reply})
+    return jsonify({"reply": reply})
 
 
+# ==============================
+# Run
+# ==============================
 if __name__ == "__main__":
     app.run(debug=True)
