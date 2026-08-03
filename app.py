@@ -274,7 +274,6 @@ from flask import Flask, render_template, request, jsonify
 import datetime
 import requests
 import wikipedia
-import pywhatkit
 import pyjokes
 
 app = Flask(__name__)
@@ -338,13 +337,10 @@ def assistant():
 
         song = text.replace("play", "").strip()
 
-        # return jsonify({
-        #     "reply":"Opening YouTube",
-        #     "youtube":f"https://www.youtube.com/results?search_query={song}"
-        # })
-        pywhatkit.playonyt(song)
-        reply = f"Playing {song}"
-        return jsonify({"reply": reply})
+        return jsonify({
+            "reply":"Opening YouTube",
+            "youtube":f"https://www.youtube.com/results?search_query={song}"
+        })
 
     else:
 
