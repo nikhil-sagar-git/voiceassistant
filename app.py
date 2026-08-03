@@ -330,6 +330,26 @@ def assistant():
     #         reply = "Sorry, I couldn't find information."
 
 
+
+    elif "send email" in text:
+
+        email = ""
+
+        subject = "Hello"
+
+        body = "This email is sent from my AI Voice Assistant."
+
+        words = text.split()
+
+        if "to" in words:
+            email = words[words.index("to")+1]
+
+        return jsonify({
+            "reply": "Opening Gmail",
+            "email": f"mailto:{email}?subject={subject}&body={body}"
+        })
+
+
     elif (
     "who is" in text or
     "what is" in text or
